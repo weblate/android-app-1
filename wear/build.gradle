@@ -1,3 +1,5 @@
+import com.android.build.gradle.internal.tasks.FinalizeBundleTask
+
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
@@ -28,6 +30,21 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    applicationVariants.configureEach { variant ->
+        variant.outputs.configureEach { output ->
+            def apkName = "OMGSoundboard_Wear_${versionCode}.apk"
+            outputFileName = apkName
+        }
+
+        tasks.named("sign${variant.flavorName.capitalize()}${variant.buildType.name.capitalize()}Bundle", FinalizeBundleTask) { task ->
+            def file = task.finalBundleFile.get().asFile
+            def finalFile = new File(file.parentFile, "OMGSoundboard_Wear_${versionCode}.aab")
+            task.finalBundleFile.set(finalFile)
+        }
+    }
+
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
